@@ -18,11 +18,13 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
 
     private final static int NUMBER_ROW = 5;
     private final static String COLOR_STATE = "colorStates";
+    private final static String FLIP_STATE = "flipState";
     private int mNumGuess = 0;
     private int mSelectedColor = -1;
     private final static int[] COLORS = {Color.BLACK, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.RED, Color.GREEN, Color.BLUE};
     private GameStatusListener mListener;
     private int[] mPermColors = new int[NUMBER_ROW * NUMBER_ROW];
+    private boolean[] mFlipped = new boolean[NUMBER_ROW * NUMBER_ROW];
 
     public BoardView(Context context) {
         this(context, null);
@@ -70,7 +72,8 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
     }
 
     @Override
-    public void colorSelected(boolean changed, int color, int row, int col) {
+    public void colorSelected(boolean flipped, int color, int row, int col) {
+        mFlipped[NUMBER_ROW * row + col] = flipped;
         if(mSelectedColor == color) {
             mNumGuess++;
             if(mNumGuess == NUMBER_ROW) {
@@ -91,6 +94,7 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
                         TileView mView = (TileView) ((ViewGroup) getChildAt(i)).getChildAt(j);
                         mView.setBackgroundColor(getResources().getColor(R.color.white));
                         mView.setFlipped(false);
+                        mFlipped[i * NUMBER_ROW + j] = false;
                     }
                 }
             }
@@ -115,11 +119,25 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
         }
     }
 
+    private void saveFlipped() {
+        for(int i = 0; i < NUMBER_ROW; i++) {
+            LinearLayout row_view = (LinearLayout) getChildAt(i);
+            row_view.setOrientation(HORIZONTAL);
+            for(int j = 0; j < NUMBER_ROW; j++) {
+                TileView tv = (TileView) row_view.getChildAt(j);
+                if(mFlipped[i * NUMBER_ROW + j]) {
+                    tv.setBackgroundColor(mPermColors[i * NUMBER_ROW + j]);
+                }
+            }
+        }
+    }
+
     @Override
     public Parcelable onSaveInstanceState() {
         Bundle bundle = new Bundle();
         bundle.putParcelable("superState", super.onSaveInstanceState());
         bundle.putIntArray(COLOR_STATE, mPermColors);
+        bundle.putBooleanArray(FLIP_STATE, mFlipped);
         return bundle;
     }
 
@@ -128,7 +146,9 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
         if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
             this.mPermColors = bundle.getIntArray(COLOR_STATE);
+            this.mFlipped = bundle.getBooleanArray(FLIP_STATE);
             saveColors();
+            saveFlipped();
             state = bundle.getParcelable("superState");
         }
         super.onRestoreInstanceState(state);

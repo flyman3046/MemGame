@@ -70,60 +70,11 @@ public class TileView extends View{
         mColor = color;
     }
 
-    @Override
-    public Parcelable onSaveInstanceState() {
-        Parcelable superState = super.onSaveInstanceState();
-        SavedState ss = new SavedState(superState);
-        ss.stateToSave = this.mColor;
-        return ss;
-    }
-
-    @Override
-    public void onRestoreInstanceState(Parcelable state) {
-        if(!(state instanceof SavedState)) {
-            super.onRestoreInstanceState(state);
-            return;
-        }
-        SavedState ss = (SavedState)state;
-        this.mColor = ss.stateToSave;
-        super.onRestoreInstanceState(ss.getSuperState());
-    }
-
     public void setColorSelectedListener(ColorSelectedListener csListener) {
         mColorSelectedListener = csListener;
     }
 
-    private static class SavedState extends View.BaseSavedState {
-        int stateToSave;
-
-        SavedState(Parcelable superState) {
-            super(superState);
-        }
-
-        private SavedState(Parcel in) {
-            super(in);
-            this.stateToSave = in.readInt();
-        }
-
-        @Override
-        public void writeToParcel(Parcel out, int flags) {
-            super.writeToParcel(out, flags);
-            out.writeInt(this.stateToSave);
-        }
-
-        //required field that makes Parcelables from a Parcel
-        public static final Parcelable.Creator<SavedState> CREATOR =
-                new Parcelable.Creator<SavedState>() {
-                    public SavedState createFromParcel(Parcel in) {
-                        return new SavedState(in);
-                    }
-                    public SavedState[] newArray(int size) {
-                        return new SavedState[size];
-                    }
-                };
-    }
-
     public interface ColorSelectedListener {
-        void colorSelected(boolean changed, int color, int row, int col);
+        void colorSelected(boolean flipped, int color, int row, int col);
     }
 }

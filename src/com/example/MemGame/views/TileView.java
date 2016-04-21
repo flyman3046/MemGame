@@ -1,24 +1,22 @@
-package com.example.MemGame.lib;
+package com.example.MemGame.views;
 
 import android.content.Context;
 import android.graphics.Color;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import com.example.MemGame.R;
 
 /**
- * Created by FZ on 9/27/2015.
+ * The tile view which is a square inside the board view.
  */
 public class TileView extends View{
-    private int bgColor = Color.RED;
-    private Context mContext;
-    private boolean isFlipped = false;
+    private int mColor = Color.RED;
+    private boolean mIsFlipped = false;
     private ColorSelectedListener mColorSelectedListener;
-    private int row = 0;
-    private int col = 0;
+    private int mRow = 0;
+    private int mCol = 0;
 
     public TileView(Context context) {
         this(context, null);
@@ -30,83 +28,72 @@ public class TileView extends View{
 
     public TileView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        mContext = context;
 
         setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int color;
-                if(isFlipped) {
+                if(mIsFlipped) {
                     color = getResources().getColor(R.color.white);
                 }
                 else {
-                    color = bgColor;
+                    color = mColor;
                 }
-                isFlipped = !isFlipped;
+                mIsFlipped = !mIsFlipped;
                 setBackgroundColor(color);
                 if(mColorSelectedListener != null) {
-                    mColorSelectedListener.colorSelected(isFlipped, color, row, col);
+                    mColorSelectedListener.colorSelected(mIsFlipped, color, mRow, mCol);
                 }
             }
         });
-        init(context);
+        init();
+    }
+
+    public void setFlipped(boolean flipped) {
+        mIsFlipped = flipped;
     }
 
     public void setLocation(int row, int col) {
-        this.row = row;
-        this.col = col;
-
+        this.mRow = row;
+        this.mCol = col;
     }
 
-    private void init(Context context) {
+    private void init() {
         setBackgroundColor(Color.WHITE);
-
-
     }
-//    public void setBackgroundColor(int color) {
-//        bgColor = color;
-//        setBackgroundColor(new ColorDrawable(color));
-//    }
+
     public int getColor() {
-        return bgColor;
+        return mColor;
     }
 
     public void setColor(int color) {
-        bgColor = color;
+        mColor = color;
     }
+
     @Override
     public Parcelable onSaveInstanceState() {
-        //begin boilerplate code that allows parent classes to save state
         Parcelable superState = super.onSaveInstanceState();
-
         SavedState ss = new SavedState(superState);
-        //end
-
-        ss.stateToSave = this.bgColor;
-
+        ss.stateToSave = this.mColor;
         return ss;
     }
 
     @Override
     public void onRestoreInstanceState(Parcelable state) {
-        //begin boilerplate code so parent classes can restore state
         if(!(state instanceof SavedState)) {
             super.onRestoreInstanceState(state);
             return;
         }
-
         SavedState ss = (SavedState)state;
+        this.mColor = ss.stateToSave;
         super.onRestoreInstanceState(ss.getSuperState());
-        //end
-
-        this.bgColor = ss.stateToSave;
     }
 
     public void setColorSelectedListener(ColorSelectedListener csListener) {
         mColorSelectedListener = csListener;
     }
 
-    static class SavedState extends View.BaseSavedState {
+    private static class SavedState extends View.BaseSavedState {
         int stateToSave;
 
         SavedState(Parcelable superState) {
@@ -137,10 +124,6 @@ public class TileView extends View{
     }
 
     public interface ColorSelectedListener {
-
         void colorSelected(boolean changed, int color, int row, int col);
-
     }
-
-
 }

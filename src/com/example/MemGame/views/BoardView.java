@@ -19,6 +19,7 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
     private final static int NUMBER_ROW = 5;
     private final static String COLOR_STATE = "colorStates";
     private final static String FLIP_STATE = "flipState";
+    private final static String SAVE_STATE = "saveState";
     private int mNumGuess = 0;
     private int mSelectedColor = -1;
     private final static int[] COLORS = {Color.BLACK, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.RED, Color.GREEN, Color.BLUE};
@@ -64,8 +65,9 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
                 tv.setLocation(i, j);
 
                 tv.setColor(mPermColors[i * NUMBER_ROW + j]);
+                LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 tv.setColorSelectedListener(this);
-                row_view.addView(tv, 160, 160);
+                row_view.addView(tv, params);
             }
             addView(row_view);
         }
@@ -135,7 +137,7 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
     @Override
     public Parcelable onSaveInstanceState() {
         Bundle bundle = new Bundle();
-        bundle.putParcelable("superState", super.onSaveInstanceState());
+        bundle.putParcelable(SAVE_STATE, super.onSaveInstanceState());
         bundle.putIntArray(COLOR_STATE, mPermColors);
         bundle.putBooleanArray(FLIP_STATE, mFlipped);
         return bundle;
@@ -149,7 +151,7 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
             this.mFlipped = bundle.getBooleanArray(FLIP_STATE);
             saveColors();
             saveFlipped();
-            state = bundle.getParcelable("superState");
+            state = bundle.getParcelable(SAVE_STATE);
         }
         super.onRestoreInstanceState(state);
     }

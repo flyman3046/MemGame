@@ -1,7 +1,9 @@
 package com.example.MemGame.views;
 
 import android.content.Context;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -22,10 +24,11 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
     private final static String SAVE_STATE = "saveState";
     private int mNumGuess = 0;
     private int mSelectedColor = -1;
-    private final static int[] COLORS = {Color.BLACK, Color.YELLOW, Color.CYAN, Color.MAGENTA, Color.RED, Color.GREEN, Color.BLUE};
+    private final static int[] COLORS = {Color.MAGENTA, Color.GRAY, Color.LTGRAY, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN};
     private GameStatusListener mListener;
     private int[] mPermColors = new int[NUMBER_ROW * NUMBER_ROW];
     private boolean[] mFlipped = new boolean[NUMBER_ROW * NUMBER_ROW];
+    private Paint mLinePaint;
 
     public BoardView(Context context) {
         this(context, null);
@@ -60,16 +63,43 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
         for(int i = 0; i < NUMBER_ROW; i++) {
             LinearLayout row_view = new LinearLayout(context);
             row_view.setOrientation(HORIZONTAL);
+            row_view.setLayoutParams(new LinearLayout.LayoutParams(
+                    LayoutParams.MATCH_PARENT,
+                    LayoutParams.MATCH_PARENT, 1.0f));
+
             for(int j = 0; j < NUMBER_ROW; j++) {
                 TileView tv = new TileView(context);
                 tv.setLocation(i, j);
 
                 tv.setColor(mPermColors[i * NUMBER_ROW + j]);
-                LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
                 tv.setColorSelectedListener(this);
-                row_view.addView(tv, params);
+                row_view.addView(tv, new LinearLayout.LayoutParams(
+                        LayoutParams.MATCH_PARENT,
+                        LayoutParams.MATCH_PARENT, 1.0f));
             }
             addView(row_view);
+        }
+
+        mLinePaint = new Paint();
+        int lineWidth = 10;
+        mLinePaint.setColor(Color.RED);
+        mLinePaint.setStrokeWidth(lineWidth);
+        mLinePaint.setStyle(Paint.Style.STROKE);
+        setWillNotDraw(false);
+    }
+
+    @Override
+    public void draw(Canvas canvas) {
+        super.draw(canvas);
+
+        int width = getWidth();
+        int height = getHeight();
+        int unitX = width / NUMBER_ROW;
+        int unitY = height / NUMBER_ROW;
+
+        for(int i = 1; i < NUMBER_ROW; i++) {
+            canvas.drawLine(0, i * unitY, width, i * unitY, mLinePaint);
+            canvas.drawLine(i * unitX, 0, i * unitX, height, mLinePaint);
         }
     }
 

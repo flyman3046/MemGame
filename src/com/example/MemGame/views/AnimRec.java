@@ -29,7 +29,7 @@ public class AnimRec extends View{
         super(context, attrs, defStyleAttr);
         mPaint = new Paint();
         mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setColor(Color.RED);
+        mPaint.setColor(Color.BLACK);
         mPaint.setStrokeWidth(30);
 
         ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);

@@ -12,7 +12,7 @@ import com.example.MemGame.R;
 import java.util.Random;
 
 /**
- * The board view which users clicks to have consecutive same color.
+ * The board view which user clicks to have consecutive same color.
  */
 public class BoardView extends LinearLayout implements TileView.ColorSelectedListener{
 

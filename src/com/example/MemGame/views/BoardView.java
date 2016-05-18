@@ -24,11 +24,13 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
     private final static String SAVE_STATE = "saveState";
     private int mNumGuess = 0;
     private int mSelectedColor = -1;
-    private final static int[] COLORS = {Color.MAGENTA, Color.GRAY, Color.LTGRAY, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN};
+    private int[] colors = new int[NUMBER_ROW];
     private GameStatusListener mListener;
     private int[] mPermColors = new int[NUMBER_ROW * NUMBER_ROW];
     private boolean[] mFlipped = new boolean[NUMBER_ROW * NUMBER_ROW];
     private Paint mLinePaint;
+    private static final int COLOR_LEVEL = 256;
+
 
     public BoardView(Context context) {
         this(context, null);
@@ -41,24 +43,12 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
         super(context, attrs, defStyle);
         init(context);
     }
+
+
     private void init(Context context) {
         setOrientation(VERTICAL);
         removeAllViews();
-
-        for(int i = 0; i < NUMBER_ROW; i++) {
-            for(int j = 0; j < NUMBER_ROW; j++) {
-                mPermColors[i * NUMBER_ROW + j] = i;
-            }
-        }
-        for(int i = 0; i < mPermColors.length; i++) {
-            int val = new Random().nextInt(mPermColors.length);
-            int temp = mPermColors[i];
-            mPermColors[i] = mPermColors[val];
-            mPermColors[val] = temp;
-        }
-        for(int i = 0; i < mPermColors.length; i++) {
-            mPermColors[i] = COLORS[mPermColors[i]];
-        }
+        initColors();
 
         for(int i = 0; i < NUMBER_ROW; i++) {
             LinearLayout row_view = new LinearLayout(context);
@@ -86,6 +76,33 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
         mLinePaint.setStrokeWidth(lineWidth);
         mLinePaint.setStyle(Paint.Style.STROKE);
         setWillNotDraw(false);
+    }
+
+
+    private void initColors() {
+        Random random = new Random();
+        for(int i = 0; i < NUMBER_ROW; i++) {
+            int color = 0xFF << 24;
+            color += random.nextInt(COLOR_LEVEL) << 16;
+            color += random.nextInt(COLOR_LEVEL) << 8;
+            color += random.nextInt(COLOR_LEVEL);
+            colors[i] = color;
+        }
+
+        for(int i = 0; i < NUMBER_ROW; i++) {
+            for(int j = 0; j < NUMBER_ROW; j++) {
+                mPermColors[i * NUMBER_ROW + j] = i;
+            }
+        }
+        for(int i = 0; i < mPermColors.length; i++) {
+            int val = new Random().nextInt(mPermColors.length);
+            int temp = mPermColors[i];
+            mPermColors[i] = mPermColors[val];
+            mPermColors[val] = temp;
+        }
+        for(int i = 0; i < mPermColors.length; i++) {
+            mPermColors[i] = colors[mPermColors[i]];
+        }
     }
 
     @Override
@@ -135,9 +152,6 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
     public void setGameStatusListener(GameStatusListener listener) {
         mListener = listener;
     }
-    public interface GameStatusListener {
-        void winGameCallback();
-    }
 
     private void saveColors() {
         for(int i = 0; i < NUMBER_ROW; i++) {
@@ -162,6 +176,10 @@ public class BoardView extends LinearLayout implements TileView.ColorSelectedLis
                 }
             }
         }
+    }
+
+    public interface GameStatusListener {
+        void winGameCallback();
     }
 
     @Override

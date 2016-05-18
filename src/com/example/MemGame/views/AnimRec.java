@@ -15,7 +15,7 @@ public class AnimRec extends View{
 
     private float mProgress;
     private Paint mPaint;
-    private static final int ANIMA_TIME = 2000;
+    private static final int ANIM_TIME = 2000;
 
     public AnimRec(Context context) {
         this(context, null);
@@ -33,7 +33,7 @@ public class AnimRec extends View{
         mPaint.setStrokeWidth(30);
 
         ValueAnimator animator = ValueAnimator.ofFloat(0f, 1f);
-        animator.setDuration(ANIMA_TIME);
+        animator.setDuration(ANIM_TIME);
 
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
